@@ -1,0 +1,19 @@
+{
+    "type": "application",
+    "platform": "browser",
+    "source-directories": [
+        "src"
+    ],
+    "gren-version": "0.5.2",
+    "dependencies": {
+        "direct": {
+            "gren-lang/browser": "5.0.0",
+            "gren-lang/core": "6.0.0",
+            "gren-lang/test": "4.1.0",
+            "gren-lang/test-runner-browser": "local:.."
+        },
+        "indirect": {
+            "gren-lang/url": "5.0.0"
+        }
+    }
+}

@@ -1,0 +1,17 @@
+{
+    "type": "package",
+    "platform": "browser",
+    "name": "gren-lang/test-runner-browser",
+    "summary": "For running gren-lang/test suites in the browser",
+    "license": "BSD-3-Clause",
+    "version": "1.0.0",
+    "exposed-modules": [
+        "Test.Runner.Browser"
+    ],
+    "gren-version": "0.5.0 <= v < 0.6.0",
+    "dependencies": {
+        "gren-lang/core": "6.0.0 <= v < 7.0.0",
+        "gren-lang/browser": "5.0.0 <= v < 6.0.0",
+        "gren-lang/test": "4.1.0 <= v < 5.0.0"
+    }
+}

@@ -1,0 +1,14 @@
+module Main exposing (main)
+
+import Expect
+import Test exposing (describe, test)
+import Test.Runner.Browser exposing (Runner, run)
+
+main : Runner
+main =
+    run <|
+        describe "All tests"
+            [ test "Failing test" <| \_ ->
+                Expect.equal True True
+            ]
+

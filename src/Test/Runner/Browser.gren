@@ -1,0 +1,175 @@
+module Test.Runner.Browser exposing (Runner, Options, run, runWithOptions)
+
+{-| Define programs that run your tests and outputs the results in the browser.
+
+@docs Program, run
+
+## Customization
+
+@docs Options, runWithOptions
+
+-}
+
+import Test exposing (Test)
+import Browser exposing (Document)
+import Html exposing (Html)
+import Html.Attributes as Attribute
+import Random
+import Task
+import Test.Runner.String as Runner exposing (Summary)
+import Time
+
+
+{-| A value representing a test program.
+-}
+type alias Runner =
+    Program {} Model Msg
+
+
+type alias Model =
+    { test : Test
+    , summary : Maybe Summary
+    , runs : Int
+    }
+
+
+type Msg
+    = GotInitialSeed Random.Seed
+
+
+-- RUN
+
+
+{-| Run a test suite using default options.
+-}
+run : Test -> Runner
+run test =
+    runHelper
+        { test = test
+        , seed = Nothing
+        , runs = 100
+        }
+
+
+type alias InitOptions =
+    { test : Test
+    , seed : Maybe Random.Seed
+    , runs : Int
+    }
+
+
+runHelper : InitOptions -> Runner
+runHelper initOptions =
+    Browser.document
+        { init = init initOptions
+        , update = update
+        , view = view
+        , subscriptions = (\_ -> Sub.none)
+        }
+
+
+init : InitOptions -> {} -> { model : Model, command : Cmd Msg }
+init { test, seed, runs } _ =
+    { model =
+        { test = test
+        , runs = runs
+        , summary = Nothing
+        }
+    , command = 
+        when seed is
+            Just s ->
+                Task.succeed s
+                    |> Task.perform GotInitialSeed
+        
+            Nothing ->
+                Time.now 
+                    |> Task.map (Time.posixToMillis >> Random.initialSeed)
+                    |> Task.perform GotInitialSeed
+    }
+
+
+update : Msg -> Model -> { model : Model, command : Cmd Msg }
+update msg model =
+    when msg is
+        GotInitialSeed seed ->
+            let
+                summary =
+                    Runner.runWithOptions model.runs seed model.test
+            in
+            { model = { model | summary = Just summary }
+            , command = Cmd.none
+            }
+
+
+view : Model -> Document Msg
+view model =
+    { title = "Tests" -- TODO: better title
+    , body =
+        [ when model.summary is
+            Just summary ->
+                summarize summary
+
+            Nothing ->
+                Html.text "Waiting for summary..."
+        ]
+    }
+
+
+summarize : Summary -> Html Msg
+summarize { output, passed, failed, autoFail } =
+    let
+        { headline, color } =
+            if failed > 0 then
+                { headline = "TEST RUN FAILED"
+                , color = "red"
+                }
+
+            else
+                when autoFail is
+                    Nothing ->
+                        { headline = "TEST RUN PASSED"
+                        , color = "green"
+                        }
+
+                    Just reason ->
+                        { headline = "TEST RUN FAILED because " ++ reason
+                        , color = "red"
+                        }
+    in
+    Html.div []
+        [ Html.h1
+            [ Attribute.style "color" color ]
+            [ Html.text headline ]
+        , Html.ul []
+            [ Html.li [] [ Html.text <| "Passed: " ++ String.fromInt passed ]
+            , Html.li [] [ Html.text <| "Failed: " ++ String.fromInt failed ]
+            ]
+        , Html.pre []
+            [ Html.text output ]
+        ]
+
+
+-- RUN WITH OPTIONS
+
+
+{-| Different options you can use to customize your test run.
+
+* `runs` configures how many times a `fuzz` test is executed with different inputs.
+* `seed` is used to generate random input in `fuzz` tests. A test suite run with the same seed will generate the same fuzz values.
+
+-}
+type alias Options =
+    { runs : Int
+    , seed : Random.Seed
+    }
+
+
+{-| Run a test suite using the provided options.
+-}
+runWithOptions : Options -> Test -> Runner
+runWithOptions options test =
+    runHelper
+        { test = test
+        , seed = Just options.seed
+        , runs = options.runs
+        }

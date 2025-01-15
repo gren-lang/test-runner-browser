@@ -1,0 +1,5 @@
+*~
+.DS_Store
+.gren/
+example/index.html
+node_modules/
