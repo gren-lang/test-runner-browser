@@ -1,5 +1,6 @@
 *~
 .DS_Store
 .gren/
+docs.json
 example/index.html
 node_modules/

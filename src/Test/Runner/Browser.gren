@@ -2,7 +2,7 @@ module Test.Runner.Browser exposing (Runner, Options, run, runWithOptions)
 
 {-| Define programs that run your tests and outputs the results in the browser.
 
-@docs Program, run
+@docs Runner, run
 
 ## Customization
 
