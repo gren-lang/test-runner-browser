@@ -1,8 +1,8 @@
-module Test.Runner.Browser exposing (Runner, Options, run, runWithOptions)
+module Test.Runner.Browser exposing (Program, Options, run, runWithOptions)
 
 {-| Define programs that run your tests and outputs the results in the browser.
 
-@docs Runner, run
+@docs Program, run
 
 ## Customization
 
@@ -22,8 +22,8 @@ import Time
 
 {-| A value representing a test program.
 -}
-type alias Runner =
-    Program {} Model Msg
+type alias Program =
+    Platform.Program {} Model Msg
 
 
 type alias Model =
@@ -42,7 +42,7 @@ type Msg
 
 {-| Run a test suite using default options.
 -}
-run : Test -> Runner
+run : Test -> Program
 run test =
     runHelper
         { test = test
@@ -58,7 +58,7 @@ type alias InitOptions =
     }
 
 
-runHelper : InitOptions -> Runner
+runHelper : InitOptions -> Program
 runHelper initOptions =
     Browser.document
         { init = init initOptions
@@ -166,7 +166,7 @@ type alias Options =
 
 {-| Run a test suite using the provided options.
 -}
-runWithOptions : Options -> Test -> Runner
+runWithOptions : Options -> Test -> Program
 runWithOptions options test =
     runHelper
         { test = test

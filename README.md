@@ -30,9 +30,9 @@ module Main exposing (main)
 
 import Expect
 import Test exposing (describe, test)
-import Test.Runner.Browser exposing (Runner, run)
+import Test.Runner.Browser exposing (Program, run)
 
-main : Runner
+main : Program
 main =
     run <|
         describe "All tests"
