@@ -4,3 +4,4 @@
 docs.json
 example/index.html
 node_modules/
+.envrc
